@@ -1,5 +1,6 @@
 using BethanysPieShop.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +12,14 @@ builder.Services.AddScoped<IShoppingCart, ShoppingCart>(sp => ShoppingCart.GetCa
 builder.Services.AddSession();
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews()
+    // Because Pie links to Categories and Categoris to Pie, we will ignore this reference cycle when serializing
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    });
+
+
 builder.Services.AddRazorPages();
 
 builder.Services.AddDbContext<BethanysPieShopDbContext>(options =>
@@ -19,6 +27,8 @@ builder.Services.AddDbContext<BethanysPieShopDbContext>(options =>
     options.UseNpgsql(
         builder.Configuration["ConnectionStrings:BethanysPieShopDbContextConnection"]);
 });
+
+
 
 var app = builder.Build();
 

@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace BethanysPieShop.Models
 {
-    public class PieRepository: IPieRepository
+    public class PieRepository : IPieRepository
     {
         private readonly BethanysPieShopDbContext _context;
 
@@ -33,5 +34,9 @@ namespace BethanysPieShop.Models
             return _context.Pies.FirstOrDefault(p => p.PieId == pieId);
         }
 
+        IEnumerable<Pie> IPieRepository.SearchPies(string searchQuery)
+        {
+            return _context.Pies.Where(p => p.Name.Contains(searchQuery));
+        }
     }
 }
